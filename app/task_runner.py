@@ -21,6 +21,7 @@ class ThreadPool:
         self.num_threads = self.get_num_threads()
         self.threads = []
         self.lock = Lock()
+        self.shutdown_event = Event()
         self.tasks_state = []
         self.data = data
         # create and start threads
@@ -35,7 +36,7 @@ class ThreadPool:
     def create_threads(self):
         """ create threads """
         for i in range(self.num_threads):
-            self.threads.append(TaskRunner(i, self.tasks_queue, self.tasks_state, self.data))
+            self.threads.append(TaskRunner(i, self.tasks_queue, self.tasks_state, self.shutdown_event, self.data))
             self.threads[i].start()
 
     # add task to queue as dictionary
@@ -53,22 +54,20 @@ class ThreadPool:
                 return True
         return False
 
-    def join_threads(self):
-        """ join threads """
-        # add None to the queue to stop threads after finishing the tasks
-        for i in range(self.num_threads):
-            self.tasks_queue.put(None)
-        for i in range(self.num_threads):
-            self.threads[i].join()
+    def shutdown(self):
+        """ shutdown threads """
+        self.shutdown_event.set()
+
 
 class TaskRunner(Thread):
     """ TaskRunner class - run tasks """
-    def __init__(self, idx, tasks_queue, tasks_state, data):
+    def __init__(self, idx, tasks_queue, tasks_state, shutdown_event, data):
         """ default constructor """
         Thread.__init__(self)
         self.idx = idx
         self.tasks_queue = tasks_queue
         self.tasks_state = tasks_state
+        self.event = shutdown_event
         self.data = data
 
     def run(self):
@@ -77,6 +76,8 @@ class TaskRunner(Thread):
             # Get pending job
             # Execute the job and save the result to disk
             # Repeat until graceful_shutdown
+            if self.event.is_set():
+                break
 
             # get task from queue (blocking, so it waints until there is a task in the queue)
             task = self.tasks_queue.get()
@@ -110,16 +111,21 @@ class TaskRunner(Thread):
             elif task['request_type'] == 'mean_by_category':
                 result = self.get_mean_by_category(task['question'])
 
-            json_string = json.dumps(result)
+            result_status = {'status': 'done', 'data': result}
             # write result to file
             file_name = 'results/' + task['job_id'] + '.txt'
             with open(file_name, 'w', encoding='utf-8') as f:
-                f.write(json_string)
+                json.dump(result_status, f)
 
             # get job_id index as int
             index = int(task['job_id'].split('_').pop()) - 1
             # mark task as done
             self.tasks_state[index][task['job_id']] = "done"
+
+            self.tasks_queue.task_done()
+
+        # end job
+        self.join()
 
 
     def get_states_values(self, q):
@@ -128,7 +134,6 @@ class TaskRunner(Thread):
         states_num = {}
         # get each row from file
         for row in self.data.list_data:
-            #print(row)
             # same question
             if row['Question'] == q:
                 if row['Location'] not in states_values:
