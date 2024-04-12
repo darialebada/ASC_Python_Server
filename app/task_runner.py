@@ -85,10 +85,6 @@ class TaskRunner(Thread):
             # get task from queue (blocking, so it waints until there is a task in the queue)
             task = self.tasks_queue.get()
 
-            # check if directory exists
-            if not os.path.exists('results'):
-                os.makedirs('results')
-
             result = TaskSolver.solve_task(self.task_solver, task)
 
             result_status = {'status': 'done', 'data': result}
