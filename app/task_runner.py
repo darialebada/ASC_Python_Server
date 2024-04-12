@@ -99,5 +99,4 @@ class TaskRunner(Thread):
             # mark task as done
             self.tasks_state[index][task['job_id']] = "done"
 
-        # end thread
-        self.join()
+
