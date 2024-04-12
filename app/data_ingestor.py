@@ -9,6 +9,7 @@ class DataIngestor:
         with open(csv_path, mode = 'r', encoding='utf-8') as f:
             data = csv.DictReader(f)
             for row in data:
+                # get only necessary data for tasks
                 dict_data_ingestor = {"Location" : row['LocationDesc'],
                         "Question" : row['Question'],
                         "Data_Value" : row['Data_Value'],

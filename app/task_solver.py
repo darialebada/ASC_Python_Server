@@ -29,7 +29,7 @@ class TaskSolver:
             task_res = self.get_mean_by_category(task['question'])
         return task_res
 
-    def get_states_values(self, q):
+    def get_states_values_helper(self, q):
         """ get states after question and location """
         states_values = {}
         states_num = {}
@@ -67,7 +67,7 @@ class TaskSolver:
     def best5(self, q):
         """ /api/best5 """
         # get average values for each state
-        states_values = self.get_states_values(q)
+        states_values = self.get_states_values_helper(q)
         sorted_states = {}
 
         if q in self.data.questions_best_is_min:
@@ -76,11 +76,11 @@ class TaskSolver:
             order_by = True
 
         # sort states by value and return first 5
-        num = 1
+        num = 0
         for state in sorted(states_values, key=states_values.get, reverse=order_by):
             sorted_states[state] = states_values[state]
             num += 1
-            if num > 5:
+            if num == 5:
                 break
 
         return sorted_states
@@ -88,7 +88,7 @@ class TaskSolver:
     def worst5(self, q):
         """ api/worst5 """
         # get average values for each state
-        states_values = self.get_states_values(q)
+        states_values = self.get_states_values_helper(q)
         sorted_states = {}
 
         if q in self.data.questions_best_is_min:
@@ -97,18 +97,19 @@ class TaskSolver:
             order_by = False
 
         # sort states by value in descending order and return first 5
-        num = 1
+        num = 0
         for state in sorted(states_values, key=states_values.get, reverse=order_by):
             sorted_states[state] = states_values[state]
             num += 1
-            if num > 5:
+            if num == 5:
                 break
+
         return sorted_states
 
     def states_mean(self, q):
         """ /api/states_mean """
         # get average values for each state
-        states_values = self.get_states_values(q)
+        states_values = self.get_states_values_helper(q)
         sorted_states = {}
         # sort states by value
         for state in sorted(states_values, key=states_values.get, reverse=False):
@@ -131,8 +132,8 @@ class TaskSolver:
     def diff_from_mean(self, q):
         """ /api/diff_from_mean """
         # get average values for each state
-        states_values = self.get_states_values(q)
-        # get average value for question (from all statess)
+        states_values = self.get_states_values_helper(q)
+        # get average value for question (from all states)
         global_mean_var = self.global_mean(q)
 
         states_diff = {}
@@ -146,11 +147,11 @@ class TaskSolver:
         """ /api/state_diff_from_mean """
         # get average value for given state
         state_mean_var = self.state_mean(q, state)
-        # get average value for question (from all statess)
+        # get average value for question (from all states)
         global_mean_var = self.global_mean(q)
         return {state : global_mean_var["global_mean"] - state_mean_var[state]}
 
-    def get_states(self, q):
+    def get_states_helper(self, q):
         """ function that returns a list of all states that answered the given question """
         states = []
         for row in self.data.list_data:
@@ -159,7 +160,7 @@ class TaskSolver:
                     states.append(row['Location'])
         return states
 
-    def get_category_name(self, category, state, stratification_category, stratification):
+    def get_category_name_helper(self, category, state, stratification_category, stratification):
         """ 
         function that returns a string that represents the category
         for mean_by_category functions
@@ -174,12 +175,13 @@ class TaskSolver:
         dict_num_cat = {}
         for row in self.data.list_data:
             if row['Stratification_Category'] == '' or row['Stratification'] == '':
+                # ignore rows with empty values
                 continue
             if row['Question'] == q and row['Location'] == state:
                 # get category name
-                category_name = self.get_category_name(category, state,
-                                                        row['Stratification_Category'],
-                                                        row['Stratification'])
+                category_name = self.get_category_name_helper(category, state,
+                                                            row['Stratification_Category'],
+                                                            row['Stratification'])
                 if category_name not in dict_categories:
                     # category hasn't been added yet to dictionary => add it
                     dict_categories[category_name] = float(row['Data_Value'])
@@ -190,7 +192,7 @@ class TaskSolver:
                     dict_num_cat[category_name] += 1
 
         dict_answer = {}
-        # sort after keys (alfabetically)
+        # sort after keys (alphabetically)
         for row in sorted(dict_categories.keys()):
             # calculate average value for each category
             dict_answer[row] = dict_categories[row] / dict_num_cat[row]
@@ -200,10 +202,10 @@ class TaskSolver:
     def get_mean_by_category(self, q):
         """ /api/mean_by_category """
         # get all states that answered the question
-        states = self.get_states(q)
+        states = self.get_states_helper(q)
         state_values_category = {}
 
-        # get values for states sorted alfabetically
+        # get values for states sorted alphabetically
         for state in sorted(states):
             # get average values for all categories for each state
             dict_categories = self.get_state_mean_by_category(q, state, 'with_state')

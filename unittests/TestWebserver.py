@@ -113,7 +113,5 @@ class TestWebserver(unittest.TestCase):
         self.assertAlmostEqual(task_res['Wyoming']["('Race/Ethnicity', 'American Indian/Alaska Native')"], 24.0, delta=0.1)
 
 
-    
-
 if __name__ == '__main__':
     unittest.main()

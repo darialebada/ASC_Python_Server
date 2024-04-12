@@ -6,9 +6,6 @@ from app.task_runner import ThreadPool
 
 webserver = Flask(__name__)
 
-# webserver.tasks_runner = ThreadPool()
-# webserver.task_runner.start()
-
 # check if directory exists
 if not os.path.exists('results'):
     os.makedirs('results')
