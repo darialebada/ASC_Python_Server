@@ -2,6 +2,7 @@
 import json
 from flask import request, jsonify
 from app import webserver
+from app.logging import logger
 
 @webserver.route('/api/post_endpoint', methods=['POST'])
 def post_endpoint():
@@ -25,8 +26,10 @@ def post_endpoint():
 @webserver.route('/api/get_results/<job_id>', methods=['GET'])
 def get_response(job_id):
     """ /api/get_results/<job_id> """
+    logger.info("Get result for job_id %s", job_id)
     # Check if job_id is valid
     if webserver.tasks_runner.check_valid_job_id(job_id) is False:
+        logger.info("Status error - invalid job_id")
         return jsonify({'status': 'error', 'reason' : 'Invalid job_id'})
 
     # check if task is done and return result if so
@@ -37,6 +40,7 @@ def get_response(job_id):
         with open(file_name, 'r', encoding='utf-8') as f:
             res = json.load(f)
 
+        logger.info("Result for %s is %s", job_id, str(res['data']))
         return jsonify({
             'status': 'done',
             'data': res['data']
@@ -53,16 +57,19 @@ def states_mean_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got states_mean_request with data: %s", str(data))
     # shutdown event is set, no more tasks can be added
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
     # get data from request and process it
-    data = request.json
     request_type = 'states_mean'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     # add task to queue to be processed by threads
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
@@ -77,14 +84,17 @@ def state_mean_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got state_mean_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'state_mean'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -98,14 +108,17 @@ def best5_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got best5_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'best5'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -118,14 +131,17 @@ def worst5_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got worst5_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'worst5'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -139,14 +155,17 @@ def global_mean_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got global_mean_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'global_mean'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -160,14 +179,17 @@ def diff_from_mean_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got diff_from_mean_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'diff_from_mean'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -181,14 +203,17 @@ def state_diff_from_mean_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got state_diff_from_mean_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'state_diff_from_mean'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -202,14 +227,17 @@ def mean_by_category_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got mean_by_category_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'mean_by_category'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -223,14 +251,17 @@ def state_mean_by_category_request():
     Increment job_id counter
     Return associated job_id
     """
+    data = request.json
+    logger.info("Got state_mean_by_category_request with data: %s", str(data))
     if webserver.tasks_runner.shutdown_event.is_set():
+        logger.info("Shutting down - request won't be processed")
         return jsonify({'job_is' : -1, 'reason' : 'shutting down'})
 
-    data = request.json
     request_type = 'state_mean_by_category'
     job_id = 'job_id_' + str(webserver.job_counter)
     webserver.job_counter += 1
 
+    logger.info("Adding task to queue with job_id: %s", job_id)
     webserver.tasks_runner.add_task(data, request_type, job_id)
 
     return jsonify({'job_id': job_id})
@@ -240,6 +271,8 @@ def jobs_response():
     """
     Return status for all job_ids
     """
+    logger.info("Got jobs request - returning all jobs status: %s",
+                str(webserver.tasks_runner.tasks_state))
     return jsonify({'status' : 'done', 'data' : webserver.tasks_runner.tasks_state})
 
 @webserver.route('/api/num_jobs', methods=['GET'])
@@ -247,11 +280,13 @@ def num_jobs_response():
     """
     Return number of running tasks
     """
+    logger.info("Got num_jobs request")
     num_running = 0
     for task in webserver.tasks_runner.tasks_state:
         for _, value in task.items():
             if value == 'running':
                 num_running += 1
+    logger.info("Number of running jobs: %s", str(num_running))
     return jsonify({'jobs_running' : num_running})
 
 @webserver.route('/api/graceful_shutdown', methods=['GET'])
@@ -259,7 +294,9 @@ def graceful_shutdown_response():
     """
     Shutdown server
     """
+    logger.info("Got graceful_shutdown request")
     webserver.tasks_runner.shutdown()
+    logger.info("Shutting down")
     return jsonify({'status' : 'shutting down'})
 
 # You can check localhost in your browser to see what this displays

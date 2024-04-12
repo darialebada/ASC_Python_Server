@@ -95,9 +95,6 @@ class TaskRunner(Thread):
             # get task from queue (blocking, so it waits until there is a task in the queue)
             task = self.tasks_queue.get()
 
-            #if task is None and self.shutdown_event.is_set():
-            #    break
-
             # solve task
             result = TaskSolver.solve_task(self.task_solver, task)
 
