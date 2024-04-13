@@ -63,7 +63,7 @@ class ThreadPool:
         self.shutdown_event.set()
         # wait for threads to finish all tasks
         while True:
-            if self.tasks_queue.empty() ==  False:
+            if self.tasks_queue.empty() is False:
                 continue
             break
         for thread in self.threads:
@@ -89,13 +89,15 @@ class TaskRunner(Thread):
             if self.shutdown_event.is_set() and self.tasks_queue.empty():
                 break
 
-            # if queue is empty => continue till is_set() ot queue not empty
+            # if queue is empty => continue till is_set() or queue not empty
             # somehow save thread from waiting forever for queue.get()
-            if self.tasks_queue.empty():
+            if self.tasks_queue.empty() is False:
+                # get task from queue (blocking, so it waits until there is a task in the queue,
+                # which could block programme at shutdown - deadlock, so we check before if queue is empty)
+                task = self.tasks_queue.get()
+            else:
+                # check again if event is set again
                 continue
-
-            # get task from queue (blocking, so it waits until there is a task in the queue)
-            task = self.tasks_queue.get()
 
             # solve task
             result = TaskSolver.solve_task(self.task_solver, task)

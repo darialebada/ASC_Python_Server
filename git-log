@@ -1,0 +1,59 @@
+commit 15db02d283fcda8ef1aca782a9068ad5f16044be
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Sat Apr 13 12:02:13 2024 +0300
+
+    readme done
+
+commit 75abd2b7626ab2036d8f58ff17446bb17d64b2dd
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Sat Apr 13 00:21:59 2024 +0300
+
+    add logging
+
+commit d7af2c3c90396d131564e93ac4e5401ca0a56b6a
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Fri Apr 12 23:24:41 2024 +0300
+
+    graceful_shutdown bug fix
+
+commit 8696945eb4236ee72a7757f3335bbcacb90e49c8
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Fri Apr 12 21:20:02 2024 +0300
+
+    graceful_shutdown correct finally
+
+commit 2f115e36cb22069b933fd98784d9df6a29cb2b50
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Fri Apr 12 20:29:13 2024 +0300
+
+    solved bug for threads
+
+commit 025af3f51ae811adf6c78418f026ee9fa55696a3
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Fri Apr 12 19:16:32 2024 +0300
+
+    solved small error + coding style
+
+commit 85c63b228bc900aa6df41165aa2e038bc7ce94a7
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Fri Apr 12 12:03:29 2024 +0300
+
+    unittest done
+
+commit 7bce22e5955727da7f9c59cf92a2fb1802d03ec2
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Thu Apr 11 23:51:49 2024 +0300
+
+    code modularization
+
+commit 86255112d9f0ee64eac38fd3d211d371e2253d73
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Thu Apr 11 23:35:35 2024 +0300
+
+    routes done
+
+commit 6fe0c7c8510317c7af19b67146cb5d94caa3a21b
+Author: Daria Lebada <daria.lebada02@gmail.com>
+Date:   Thu Apr 11 17:15:17 2024 +0300
+
+    add hw - max on checker
