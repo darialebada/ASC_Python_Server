@@ -62,8 +62,10 @@ class ThreadPool:
         """ set shutdown event to notify threads to stop when queue is empty """
         self.shutdown_event.set()
         # wait for threads to finish all tasks
-        while not self.tasks_queue.empty():
-            continue
+        while True:
+            if self.tasks_queue.empty() ==  False:
+                continue
+            break
         for thread in self.threads:
             thread.join()
 
@@ -88,7 +90,7 @@ class TaskRunner(Thread):
                 break
 
             # if queue is empty => continue till is_set() ot queue not empty
-            # somehow save thread from wainting forever for queue.get()
+            # somehow save thread from waiting forever for queue.get()
             if self.tasks_queue.empty():
                 continue
 
